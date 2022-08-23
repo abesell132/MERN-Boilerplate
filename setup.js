@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
+const path = require("path");
 
 const app = express();
 const db = require("./config/keys").mongoURI;
@@ -29,5 +30,16 @@ async function connectToDatabase() {
 }
 
 async function startAPIListener() {
+  if (process.argv[2] !== "dev") {
+    console.log("Launching in Production Mode");
+    app.use(express.static(path.join(__dirname, "client/build")));
+
+    app.get("/", function (req, res) {
+      res.sendFile(path.join(__dirname, "client/build", "index.html"));
+    });
+  } else {
+    console.log("Lanching in Development Mode");
+  }
+
   app.listen(port, () => Promise.resolve());
 }
